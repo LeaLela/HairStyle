@@ -10,11 +10,8 @@ import {
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
-import { collection,doc,setDoc,addDoc } from 'firebase/firestore';
-import { db, auth } from '../../firebase';
-import firestore from '@react-native-firebase/firestore';
-//import auth from '@react-native-firebase/auth';
-
+import { collection, addDoc } from 'firebase/firestore';
+import { auth, db } from '../../firebase';
 
 const times = ["9:00", "10:00", "11:00", "12:00","13:00", "14:00", "15:00", "16:00","17:00"];
 const { width } = Dimensions.get("window");
@@ -25,7 +22,7 @@ const getDaysInMonth = () => {
   return eachDayOfInterval({ start, end }).map(date => format(date, 'EEE dd'));
 };
 
-export const WomenScreen: React.FC = () => {
+export const MenScreen: React.FC = () => {
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -65,7 +62,7 @@ export const WomenScreen: React.FC = () => {
         service: selectedService,
         day: selectedDay,
         time: selectedTime,
-        userId: userId,  // Include the user ID in the booking
+        userId: userId,
         createdAt: new Date(),
       });
       console.log("Document written with ID: ", docRef.id);
@@ -92,9 +89,9 @@ export const WomenScreen: React.FC = () => {
       <RNPickerSelect
         onValueChange={(value) => setSelectedService(value)}
         items={[
-          { label: "Hair Cut & Color", value: "hair_cut_color" },
+          { label: "Hair Cut & Shave", value: "hair_cut_shave" },
           { label: "Hair Cut", value: "hair_cut" },
-          { label: "Hair Color", value: "hair_color" },
+          { label: "Shave", value: "shave" },
         ]}
         style={pickerSelectStyles}
         placeholder={{ label: "Select a service...", value: null }}
@@ -266,4 +263,4 @@ const pickerSelectStyles = StyleSheet.create({
   },
 });
 
-export default WomenScreen;
+export default MenScreen;

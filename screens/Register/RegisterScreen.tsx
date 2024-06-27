@@ -49,7 +49,7 @@ export const RegisterScreen: React.FC = () => {
   // };
  const createProfile = async (response: any) => {
     const usersCollection = collection(db, "users");
-    const userDoc = doc(usersCollection, response.user.email);
+    const userDoc = doc(usersCollection, response.user.uid);
   
     await setDoc(userDoc, {
       Ime,
@@ -60,7 +60,7 @@ export const RegisterScreen: React.FC = () => {
       Datum_rodjenja
     });
   
-    console.log("User profile created successfully", usersCollection, userDoc);
+    console.log("User profile created successfully", usersCollection, userDoc, response.user.uid);
   };
   const registerAndGoToMainFlow = async () => {
     if (!Ime || !Email || !Lozinka || !Prezime || !Telefon || !Spol || !Datum_rodjenja) {

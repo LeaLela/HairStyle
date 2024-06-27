@@ -9,6 +9,10 @@ export const ProfileScreen : React.FC = () => {
   const goToWomenHairstyles = () => {
     nav.navigate("WomenScreen");
   };
+
+  const goToMenHairstyles = () => {
+    nav.navigate("MenScreen");
+  };
   
   return (
   <View style={styles.container}>
@@ -23,7 +27,7 @@ export const ProfileScreen : React.FC = () => {
         />
         <Text style={styles.cardTitle}>Women hairstyles</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.card}>
+      <TouchableOpacity style={styles.card} onPress={goToMenHairstyles}>
         <Image
           source={require("../../assets/men_hairstyles.png")}
           style={styles.image}

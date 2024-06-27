@@ -6,7 +6,9 @@ import { HomePage } from "./screens/HomePage/HomePage";
 import { RegisterScreen } from "./screens/Register/RegisterScreen";
 import { LoginScreen } from "./screens/Login/LoginScreen";
 import { ProfileScreen } from "./screens/Profile/ProfileScreen";
-import { WomenScreen } from "./screens/WomenScreen/WomenScreen"; 
+import { WomenScreen } from "./screens/WomenScreen/WomenScreen";
+import { MenScreen } from "./screens/MenScreen/MenScreen";
+
 
 // type RootStackParamList = {
 //   Home: undefined;
@@ -71,6 +73,19 @@ export default function App() {
         <Stack.Screen
             name="WomenScreen"
             component={WomenScreen}
+            options={{
+              title: "Hair styles",
+              headerShown: true,
+              headerTintColor: "#ff5e3a",
+              headerTitleStyle: { color: "white" },
+              headerStyle: {
+                backgroundColor: "rgb(28 35 48)",
+            },
+          }}
+        />
+          <Stack.Screen
+            name="MenScreen"
+            component={MenScreen}
             options={{
               title: "Hair styles",
               headerShown: true,
