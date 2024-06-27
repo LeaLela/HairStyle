@@ -13,6 +13,8 @@ import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval } from 'da
 import { collection,doc,setDoc,addDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
 import firestore from '@react-native-firebase/firestore';
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { RootStackParamList } from "../../App";
 //import auth from '@react-native-firebase/auth';
 
 
@@ -25,12 +27,15 @@ const getDaysInMonth = () => {
   return eachDayOfInterval({ start, end }).map(date => format(date, 'EEE dd'));
 };
 
+type WomenScreenRouteProp = RouteProp<RootStackParamList, "WomenScreen">;
+
 export const WomenScreen: React.FC = () => {
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [daysOfMonth, setDaysOfMonth] = useState<string[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const route = useRoute<WomenScreenRouteProp>();
 
   useEffect(() => {
     setDaysOfMonth(getDaysInMonth());
@@ -59,13 +64,16 @@ export const WomenScreen: React.FC = () => {
       return;
     }
 
+    const hairStyle = route.params.hairStyle;
+
     try {
       const bookingRef = collection(db, "bookings");
       const docRef = await addDoc(bookingRef, {
+        hairStyle: hairStyle,
         service: selectedService,
         day: selectedDay,
         time: selectedTime,
-        userId: userId,  // Include the user ID in the booking
+        userId: userId,
         createdAt: new Date(),
       });
       console.log("Document written with ID: ", docRef.id);

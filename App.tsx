@@ -9,6 +9,10 @@ import { ProfileScreen } from "./screens/Profile/ProfileScreen";
 import { WomenScreen } from "./screens/WomenScreen/WomenScreen";
 import { MenScreen } from "./screens/MenScreen/MenScreen";
 
+export type RootStackParamList = {
+  WomenScreen: { hairStyle: "Women" };
+  MenScreen: { hairStyle: "Men" };
+};
 
 // type RootStackParamList = {
 //   Home: undefined;
