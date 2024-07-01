@@ -15,6 +15,7 @@ import { auth, db } from "../../firebase";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { collection, doc, setDoc } from "firebase/firestore";
+import Toast from 'react-native-toast-message';
 
 
 
@@ -62,11 +63,74 @@ export const RegisterScreen: React.FC = () => {
   
     console.log("User profile created successfully", usersCollection, userDoc, response.user.uid);
   };
+  const validateFields = () => {
+    if (!Ime) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'First Name is required.'
+      });
+      return false;
+    }
+    if (!Prezime) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Last Name is required.'
+      });
+      return false;
+    }
+    if (!Email) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Email is required.'
+      });
+      return false;
+    }
+    if (!Lozinka) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Password is required.'
+      });
+      return false;
+    }
+    if (!Datum_rodjenja) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Birth Date is required.'
+      });
+      return false;
+    }
+    if (!Telefon) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Phone Number is required.'
+      });
+      return false;
+    }
+    if (!Spol) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Gender is required.'
+      });
+      return false;
+    }
+    // Additional validation for email format, password length, etc. can be added here
+    return true;
+  };
   const registerAndGoToMainFlow = async () => {
-    if (!Ime || !Email || !Lozinka || !Prezime || !Telefon || !Spol || !Datum_rodjenja) {
-      Alert.alert("Error", "Please fill in all fields");
+    if (!validateFields()) {
       return;
     }
+    // if (!Ime || !Email || !Lozinka || !Prezime || !Telefon || !Spol || !Datum_rodjenja) {
+    //   Alert.alert("Error", "Please fill in all fields");
+    //   return;
+    // }
     try {
       const response = await createUserWithEmailAndPassword(
         auth,
@@ -83,9 +147,20 @@ export const RegisterScreen: React.FC = () => {
       setGender("");
       goToLogin();
 
-      
-    } catch (error) {
+      // Pokaži Toast obavijest nakon uspješne registracije
+      Toast.show({
+        type: 'success',
+        text1: 'Registration Successful',
+        text2: 'You have successfully registered.'
+      });
+
+    } catch (error: any) {
       console.log(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Registration Failed',
+        text2: error.message
+      });
     }
   };
 

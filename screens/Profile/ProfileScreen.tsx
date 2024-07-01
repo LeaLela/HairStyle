@@ -21,6 +21,10 @@ export const ProfileScreen : React.FC = () => {
     nav.navigate("MenScreen", { hairStyle: "Men" });
   };
 
+  const goToMyBookings = () => {
+    nav.navigate("MyBookingsScreen");
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -41,7 +45,7 @@ export const ProfileScreen : React.FC = () => {
           />
           <Text style={styles.cardTitle}>Men hairstyles</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={goToMyBookings}>
           <Image
             source={require("../../assets/my_bookings.png")}
             style={styles.image}

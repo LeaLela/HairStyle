@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { getAuth, signInWithEmailAndPassword} from "firebase/auth";
 import {auth} from "../../firebase";
+import Toast from 'react-native-toast-message';
 
 
 export const LoginScreen: React.FC = () => {
@@ -31,16 +32,25 @@ export const LoginScreen: React.FC = () => {
   };
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Email and password are required.'
+      });
+      return;
+    }
+
     try {
-      if (email && password) {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        // Handle successful login
-        goToHome();
-      } else {
-        console.error("Email and password are required");
-      }
-    } catch (error) {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      goToHome();
+    } catch (error: any) {
       console.error(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Login Failed',
+        text2: error.message
+      });
     }
   };
 

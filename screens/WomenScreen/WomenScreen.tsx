@@ -15,17 +15,20 @@ import { db, auth } from '../../firebase';
 import firestore from '@react-native-firebase/firestore';
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
+import Toast from 'react-native-toast-message';
+import { query, where, getDocs } from "firebase/firestore";
+
 //import auth from '@react-native-firebase/auth';
 
 
 const times = ["9:00", "10:00", "11:00", "12:00","13:00", "14:00", "15:00", "16:00","17:00"];
 const { width } = Dimensions.get("window");
 
-const getDaysInMonth = () => {
-  const start = startOfMonth(new Date());
-  const end = endOfMonth(new Date());
-  return eachDayOfInterval({ start, end }).map(date => format(date, 'EEE dd'));
-};
+// const getDaysInMonth = () => {
+//   const start = startOfMonth(new Date());
+//   const end = endOfMonth(new Date());
+//   return eachDayOfInterval({ start, end }).map(date => format(date, 'EEE dd'));
+// };
 
 type WomenScreenRouteProp = RouteProp<RootStackParamList, "WomenScreen">;
 
@@ -53,17 +56,45 @@ export const WomenScreen: React.FC = () => {
     return unsubscribe;
   }, []);
 
+  //Dani u mjesecu u real time
+  const getDaysInMonth = () => {
+    const start = startOfMonth(new Date());
+    const end = endOfMonth(new Date());
+    return eachDayOfInterval({ start, end }).map(date => format(date, 'EEE dd'));
+  };
+  
+  
   const handleConfirm = async () => {
-    if (!selectedService || !selectedDay || !selectedTime) {
-      Alert.alert("Incomplete Selection", "Please select service, day and time before confirming.");
+    if (!["hair_cut_color", "hair_cut", "hair_color"].includes(selectedService || ""))  {
+      Toast.show({
+        type: 'error',
+        text1: 'Incomplete Selection',
+        text2: 'Please select service, day and time before confirming.'
+      });
       return;
     }
+// Provjera u bazi je li već postoji rezervacija za isti dan i vrijeme
+    const querySnapshot = await getDocs(query(collection(db, 'bookings'),
+      where('day', '==', selectedDay),
+      where('time', '==', selectedTime)
+    ));
 
+    if (!querySnapshot.empty) {
+      Toast.show({
+        type: 'error',
+        text1: 'Time Slot Already Booked',
+        text2: 'Please select a different time slot.'
+      });
+      return;
+    }
     if (!userId) {
-      Alert.alert("User not logged in", "Please log in to make a booking.");
+      Toast.show({
+        type: 'error',
+        text1: 'User not logged in',
+        text2: 'Please log in to make a booking.'
+      });
       return;
-    }
-
+    };
     const hairStyle = route.params.hairStyle;
 
     try {
@@ -77,10 +108,18 @@ export const WomenScreen: React.FC = () => {
         createdAt: new Date(),
       });
       console.log("Document written with ID: ", docRef.id);
-      Alert.alert("Booking Confirmed", `Your booking ID is ${docRef.id}`);
+      Toast.show({
+        type: 'success',
+        text1: 'Booking Confirmed',
+        text2: `Your booking ID is ${docRef.id}`
+      });
     } catch (e) {
       console.error("Error adding document: ", e);
-      Alert.alert("Error", "Something went wrong while booking. Please try again.");
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Something went wrong while booking. Please try again.'
+      });
     }
   };
 
