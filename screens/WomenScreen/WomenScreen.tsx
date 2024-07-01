@@ -6,29 +6,19 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  Alert,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
-import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
-import { collection,doc,setDoc,addDoc } from 'firebase/firestore';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
+import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
-import firestore from '@react-native-firebase/firestore';
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../../App";
 import Toast from 'react-native-toast-message';
-import { query, where, getDocs } from "firebase/firestore";
+import { RootStackParamList } from "../../App";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import {useNavigation} from '@react-navigation/native';
 
-//import auth from '@react-native-firebase/auth';
-
-
-const times = ["9:00", "10:00", "11:00", "12:00","13:00", "14:00", "15:00", "16:00","17:00"];
+const times = ["9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 const { width } = Dimensions.get("window");
-
-// const getDaysInMonth = () => {
-//   const start = startOfMonth(new Date());
-//   const end = endOfMonth(new Date());
-//   return eachDayOfInterval({ start, end }).map(date => format(date, 'EEE dd'));
-// };
 
 type WomenScreenRouteProp = RouteProp<RootStackParamList, "WomenScreen">;
 
@@ -38,8 +28,14 @@ export const WomenScreen: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [daysOfMonth, setDaysOfMonth] = useState<string[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const [disabledTimes, setDisabledTimes] = useState<string[]>([]); // State for disabled times
   const route = useRoute<WomenScreenRouteProp>();
+  
 
+ const nav = useNavigation<NativeStackNavigationProp<any>>();
+const goToHome = async () => {
+  nav.navigate("Profile");
+};
   useEffect(() => {
     setDaysOfMonth(getDaysInMonth());
   }, []);
@@ -56,24 +52,33 @@ export const WomenScreen: React.FC = () => {
     return unsubscribe;
   }, []);
 
-  //Dani u mjesecu u real time
   const getDaysInMonth = () => {
     const start = startOfMonth(new Date());
     const end = endOfMonth(new Date());
     return eachDayOfInterval({ start, end }).map(date => format(date, 'EEE dd'));
   };
-  
-  
+
+  const fetchDisabledTimes = async (day: string) => {
+    if (!day) return;
+
+    const bookingsRef = collection(db, 'bookings');
+    const q = query(bookingsRef, where('day', '==', day));
+    const querySnapshot = await getDocs(q);
+    const disabledTimesArray = querySnapshot.docs.map(doc => doc.data().time);
+
+    setDisabledTimes(disabledTimesArray);
+  };
+
   const handleConfirm = async () => {
-    if (!["hair_cut_color", "hair_cut", "hair_color"].includes(selectedService || ""))  {
+    if (!["hair_cut_color", "hair_cut", "hair_color"].includes(selectedService || "")) {
       Toast.show({
         type: 'error',
-        text1: 'Incomplete Selection',
-        text2: 'Please select service, day and time before confirming.'
+        text1: 'Invalid Service Selection',
+        text2: 'Please select a valid service option.'
       });
       return;
     }
-// Provjera u bazi je li već postoji rezervacija za isti dan i vrijeme
+
     const querySnapshot = await getDocs(query(collection(db, 'bookings'),
       where('day', '==', selectedDay),
       where('time', '==', selectedTime)
@@ -87,6 +92,16 @@ export const WomenScreen: React.FC = () => {
       });
       return;
     }
+
+    if (!selectedService || !selectedDay || !selectedTime) {
+      Toast.show({
+        type: 'error',
+        text1: 'Incomplete Selection',
+        text2: 'Please select service, day and time before confirming.'
+      });
+      return;
+    }
+
     if (!userId) {
       Toast.show({
         type: 'error',
@@ -94,7 +109,8 @@ export const WomenScreen: React.FC = () => {
         text2: 'Please log in to make a booking.'
       });
       return;
-    };
+    }
+
     const hairStyle = route.params.hairStyle;
 
     try {
@@ -113,6 +129,7 @@ export const WomenScreen: React.FC = () => {
         text1: 'Booking Confirmed',
         text2: `Your booking ID is ${docRef.id}`
       });
+      goToHome();
     } catch (e) {
       console.error("Error adding document: ", e);
       Toast.show({
@@ -125,12 +142,41 @@ export const WomenScreen: React.FC = () => {
 
   const handleDaySelection = (day: string) => {
     setSelectedDay(day);
+    fetchDisabledTimes(day); // Fetch disabled times for newly selected day
   };
 
   const handleTimeSelection = (time: string) => {
     setSelectedTime(time);
   };
-  
+
+  const renderTimeButtons = () => {
+    return times.map((time) => {
+      const isDisabled = disabledTimes.includes(time);
+
+      return (
+        <TouchableOpacity
+          key={time}
+          style={[
+            styles.timeButton,
+            isDisabled && styles.disabledTimeButton,
+            selectedTime === time && styles.selectedTimeButton,
+          ]}
+          onPress={() => handleTimeSelection(time)}
+          disabled={isDisabled} // Disable onPress if time is already booked
+        >
+          <Text
+            style={[
+              styles.timeButtonText,
+              isDisabled && styles.disabledTimeButtonText,
+              selectedTime === time && styles.selectedTimeButtonText,
+            ]}
+          >
+            {time}
+          </Text>
+        </TouchableOpacity>
+      );
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -172,25 +218,7 @@ export const WomenScreen: React.FC = () => {
       </ScrollView>
 
       <ScrollView horizontal contentContainerStyle={styles.timeContainer}>
-        {times.map((time) => (
-          <TouchableOpacity
-            key={time}
-            style={[
-              styles.timeButton,
-              selectedTime === time && styles.selectedTimeButton,
-            ]}
-            onPress={() => handleTimeSelection(time)}
-          >
-            <Text
-              style={[
-                styles.timeButtonText,
-                selectedTime === time && styles.selectedTimeButtonText,
-              ]}
-            >
-              {time}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        {renderTimeButtons()}
       </ScrollView>
 
       <View style={styles.selectionSummary}>
@@ -260,9 +288,15 @@ const styles = StyleSheet.create({
     minWidth: width / 5 - 10,
     alignItems: 'center',
   },
+  disabledTimeButton: {
+    backgroundColor: "#d3d3d3", // Different background color for disabled times
+  },
   timeButtonText: {
     fontSize: 14,
     color: "#f2f2f0",
+  },
+  disabledTimeButtonText: {
+    color: "#a0a0a0", // Different text color for disabled times
   },
   selectedTimeButton: {
     backgroundColor: "#ff5e3a",
@@ -309,8 +343,17 @@ const pickerSelectStyles = StyleSheet.create({
     marginBottom: 20,
     width: width * 0.9,
     textAlign: "center",
-    backgroundColor: "#f2f2f0",
   },
 });
 
-export default WomenScreen;
+
+
+
+
+
+
+
+
+
+
+
