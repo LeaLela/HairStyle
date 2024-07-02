@@ -128,17 +128,6 @@ export const AdminScreen: React.FC = () => {
           ))
         )}
       </ScrollView>
-
-      <Text style={styles.subtitle}>Add New Admin</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter user email"
-        value={newAdminEmail}
-        onChangeText={setNewAdminEmail}
-      />
-      <TouchableOpacity style={styles.addButton} onPress={handleAddAdmin}>
-        <Text style={styles.addButtonText}>Add Admin</Text>
-      </TouchableOpacity>
     </View>
   );
 };
