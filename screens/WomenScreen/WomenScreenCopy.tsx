@@ -8,27 +8,6 @@ import {
   Dimensions,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
-<<<<<<< HEAD
-import { format, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
-import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
-import { auth, db } from '../../firebase';
-import { RouteProp, useRoute } from "@react-navigation/native";
-import Toast from 'react-native-toast-message';
-import { RootStackParamList } from "../../App";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import {useNavigation} from '@react-navigation/native';
-
-
-const times = ["9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-const { width } = Dimensions.get("window");
-
-const getDaysInMonth = () => {
-  const start = startOfMonth(new Date());
-  const end = endOfMonth(new Date());
-  return eachDayOfInterval({ start, end }).map(date => format(date, 'EEE dd'));
-};
-
-=======
 import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db, auth } from "../../firebase";
@@ -39,170 +18,29 @@ import { ServiceTypes, getServiceOptions } from "../../utils/serviceTypes";
 import { useDateAndTime, useUserData } from "../../hooks/hooks";
 import { getDisabledSlots } from "../../utils/getDisableSlots";
 
-
-//const times = ["9:00", "10:00", "11:00", "12:00","13:00", "14:00", "15:00", "16:00","17:00"];
 const { width } = Dimensions.get("window");
 
-// const getDaysInMonth = () => {
-//   const start = startOfMonth(new Date());
-//   const end = endOfMonth(new Date());
-//   return eachDayOfInterval({ start, end }).map(date => format(date, 'EEE dd'));
-// };
->>>>>>> extract-components
-type MenScreenRouteProp = RouteProp<RootStackParamList, 'MenScreen'>;
+type WomenScreenRouteProp = RouteProp<RootStackParamList, "WomenScreen">;
 
-export const MenScreen: React.FC = () => {
-
-  const route = useRoute<MenScreenRouteProp>();
+export const WomenScreenCopy: React.FC = () => {
+  const route = useRoute<WomenScreenRouteProp>();
   const userId = useUserData();
   const { daysOfMonth, times } = useDateAndTime();
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-<<<<<<< HEAD
-  const [daysOfMonth, setDaysOfMonth] = useState<string[]>([]);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [disabledTimes, setDisabledTimes] = useState<string[]>([]); // State for disabled times
-  const route = useRoute<MenScreenRouteProp>();
-
-  const nav = useNavigation<NativeStackNavigationProp<any>>();
-  const goToHome = async () => {
-    nav.navigate("Profile");
-  };
-
-  useEffect(() => {
-    setDaysOfMonth(getDaysInMonth());
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUserId(user.uid);
-      } else {
-        setUserId(null);
-      }
-    });
-
-    return unsubscribe;
-  }, []);
-
-  const fetchDisabledTimes = async (day: string) => {
-    if (!day) return;
-
-    const bookingsRef = collection(db, 'bookings');
-    const q = query(bookingsRef, where('day', '==', day));
-    const querySnapshot = await getDocs(q);
-    const disabledTimesArray = querySnapshot.docs.map(doc => doc.data().time);
-
-    setDisabledTimes(disabledTimesArray);
-  };
-
-  const handleConfirm = async () => {
-    if (!["hair_cut_shave", "hair_cut", "shave"].includes(selectedService || "")) {
-      Toast.show({
-        type: 'error',
-        text1: 'Incomplete Selection',
-        text2: 'Please select service, day and time before confirming.'
-      });
-      return;
-    }
-
-    const querySnapshot = await getDocs(query(collection(db, 'bookings'),
-      where('day', '==', selectedDay),
-      where('time', '==', selectedTime)
-    ));
-
-    if (!querySnapshot.empty) {
-      Toast.show({
-        type: 'error',
-        text1: 'Time Slot Already Booked',
-        text2: 'Please select a different time slot.'
-      });
-      return;
-    }
-
-    if (!userId) {
-      Toast.show({
-        type: 'error',
-        text1: 'User not logged in',
-        text2: 'Please log in to make a booking.'
-      });
-      return;
-    }
-
-    const hairStyle = route.params.hairStyle;
-
-    try {
-      const bookingRef = collection(db, "bookings");
-      const docRef = await addDoc(bookingRef, {
-        hairStyle: hairStyle,
-        service: selectedService,
-        day: selectedDay,
-        time: selectedTime,
-        userId: userId,
-        createdAt: new Date(),
-      });
-      console.log("Document written with ID: ", docRef.id);
-      Toast.show({
-        type: 'success',
-        text1: 'Booking Confirmed',
-        text2: `Your booking ID is ${docRef.id}`
-      });
-      goToHome();
-    } catch (e) {
-      console.error("Error adding document: ", e);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Something went wrong while booking. Please try again.'
-      });
-    }
-  };
-=======
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [disabledSlots, setDisabledSlots] = useState<
     { day: string; time: string }[]
   >([]);
->>>>>>> extract-components
 
   const handleDaySelection = (day: string) => {
     setSelectedDay(day);
-    fetchDisabledTimes(day); // Fetch disabled times for newly selected day
   };
 
   const handleTimeSelection = (time: string) => {
     setSelectedTime(time);
   };
 
-<<<<<<< HEAD
-  const renderTimeButtons = () => {
-    return times.map((time) => {
-      const isDisabled = disabledTimes.includes(time);
-
-      return (
-        <TouchableOpacity
-          key={time}
-          style={[
-            styles.timeButton,
-            isDisabled && styles.disabledTimeButton,
-            selectedTime === time && styles.selectedTimeButton,
-          ]}
-          onPress={() => handleTimeSelection(time)}
-          disabled={isDisabled} // Disable onPress if time is already booked
-        >
-          <Text
-            style={[
-              styles.timeButtonText,
-              isDisabled && styles.disabledTimeButtonText,
-              selectedTime === time && styles.selectedTimeButtonText,
-            ]}
-          >
-            {time}
-          </Text>
-        </TouchableOpacity>
-      );
-    });
-  };
-=======
   const handleConfirm = useHandleConfirm(
     selectedService,
     selectedDay,
@@ -220,8 +58,6 @@ export const MenScreen: React.FC = () => {
 
     fetchDisabledSlots();
   }, [daysOfMonth, times]);
->>>>>>> extract-components
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Booking</Text>
@@ -256,10 +92,8 @@ export const MenScreen: React.FC = () => {
           </TouchableOpacity>
         ))}
       </ScrollView>
+
       <ScrollView horizontal contentContainerStyle={styles.timeContainer}>
-<<<<<<< HEAD
-        {renderTimeButtons()}
-=======
         {times.map((time) => {
           const isDisabled = disabledSlots.some(
             (slot) => slot.day === selectedDay && slot.time === time
@@ -283,12 +117,12 @@ export const MenScreen: React.FC = () => {
                 ]}
               >
                 {time}
-            </Text>
-          </TouchableOpacity>
+              </Text>
+            </TouchableOpacity>
           );
         })}
->>>>>>> extract-components
       </ScrollView>
+
       <View style={styles.selectionSummary}>
         <Text>
           Selected Service:
@@ -356,23 +190,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#3b3f5c",
     borderRadius: 5,
     marginHorizontal: 5,
-<<<<<<< HEAD
-    minWidth: width / 5 - 10,
-    alignItems: 'center',
-  },
-  disabledTimeButton: {
-    backgroundColor: "#d3d3d3", // Different background color for disabled times
-  },
-  timeButtonText: {
-    fontSize: 14,
-    color: "#f2f2f0",
-=======
     minWidth: width * 0.15,
     alignItems: "center",
->>>>>>> extract-components
-  },
-  disabledTimeButtonText: {
-    color: "#a0a0a0", // Different text color for disabled times
   },
   selectedTimeButton: {
     backgroundColor: "#f77f00",
@@ -431,5 +250,3 @@ const pickerSelectStyles = StyleSheet.create({
     marginBottom: 20,
   },
 });
-
-export default MenScreen;
