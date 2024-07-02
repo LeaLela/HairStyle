@@ -6,114 +6,40 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  Alert,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
-import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
-import { collection, addDoc } from 'firebase/firestore';
-import { auth, db } from '../../firebase';
-import { RouteProp } from "@react-navigation/native";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db, auth } from "../../firebase";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
-import { useRoute } from '@react-navigation/native';
-import Toast from 'react-native-toast-message';
-import { query, where, getDocs } from "firebase/firestore";
+import { useHandleConfirm } from "../../utils/useHandleConfirm";
+import { ServiceTypes, getServiceOptions } from "../../utils/serviceTypes";
+import { useDateAndTime, useUserData } from "../../hooks/hooks";
+import { getDisabledSlots } from "../../utils/getDisableSlots";
 
 
-const times = ["9:00", "10:00", "11:00", "12:00","13:00", "14:00", "15:00", "16:00","17:00"];
+//const times = ["9:00", "10:00", "11:00", "12:00","13:00", "14:00", "15:00", "16:00","17:00"];
 const { width } = Dimensions.get("window");
 
-const getDaysInMonth = () => {
-  const start = startOfMonth(new Date());
-  const end = endOfMonth(new Date());
-  return eachDayOfInterval({ start, end }).map(date => format(date, 'EEE dd'));
-};
+// const getDaysInMonth = () => {
+//   const start = startOfMonth(new Date());
+//   const end = endOfMonth(new Date());
+//   return eachDayOfInterval({ start, end }).map(date => format(date, 'EEE dd'));
+// };
 type MenScreenRouteProp = RouteProp<RootStackParamList, 'MenScreen'>;
 
 export const MenScreen: React.FC = () => {
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+
+  const route = useRoute<MenScreenRouteProp>();
+  const userId = useUserData();
+  const { daysOfMonth, times } = useDateAndTime();
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [daysOfMonth, setDaysOfMonth] = useState<string[]>([]);
-  const [userId, setUserId] = useState<string | null>(null);
-  const route = useRoute<MenScreenRouteProp>();
-
-  useEffect(() => {
-    setDaysOfMonth(getDaysInMonth());
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUserId(user.uid);
-      } else {
-        setUserId(null);
-      }
-    });
-
-    return unsubscribe;
-  }, []);
-
-  const handleConfirm = async () => {
-    if (!["hair_cut_shave", "hair_cut", "shave"].includes(selectedService || ""))  {
-      Toast.show({
-        type: 'error',
-        text1: 'Incomplete Selection',
-        text2: 'Please select service, day and time before confirming.'
-      });
-      return;
-    }
-
-    // Provjera u bazi je li već postoji rezervacija za isti dan i vrijeme
-    const querySnapshot = await getDocs(query(collection(db, 'bookings'),
-      where('day', '==', selectedDay),
-      where('time', '==', selectedTime)
-    ));
-
-    if (!querySnapshot.empty) {
-      Toast.show({
-        type: 'error',
-        text1: 'Time Slot Already Booked',
-        text2: 'Please select a different time slot.'
-      });
-      return;
-    }
- 
-
-    if (!userId) {
-      Toast.show({
-        type: 'error',
-        text1: 'User not logged in',
-        text2: 'Please log in to make a booking.'
-      });
-      return;
-    };
-    const hairStyle = route.params.hairStyle;
-
-    try {
-      const bookingRef = collection(db, "bookings");
-      const docRef = await addDoc(bookingRef, {
-        hairStyle: hairStyle,
-        service: selectedService,
-        day: selectedDay,
-        time: selectedTime,
-        userId: userId,
-        createdAt: new Date(),
-      });
-      console.log("Document written with ID: ", docRef.id);
-      Toast.show({
-        type: 'success',
-        text1: 'Booking Confirmed',
-        text2: `Your booking ID is ${docRef.id}`
-      });
-    } catch (e) {
-      console.error("Error adding document: ", e);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Something went wrong while booking. Please try again.'
-      });
-    }
-  };
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [disabledSlots, setDisabledSlots] = useState<
+    { day: string; time: string }[]
+  >([]);
 
   const handleDaySelection = (day: string) => {
     setSelectedDay(day);
@@ -122,7 +48,24 @@ export const MenScreen: React.FC = () => {
   const handleTimeSelection = (time: string) => {
     setSelectedTime(time);
   };
-  
+
+  const handleConfirm = useHandleConfirm(
+    selectedService,
+    selectedDay,
+    selectedTime,
+    userId,
+    route.params.hairStyle,
+    db
+  );
+
+  useEffect(() => {
+    const fetchDisabledSlots = async () => {
+      const slots = await getDisabledSlots();
+      setDisabledSlots(slots);
+    };
+
+    fetchDisabledSlots();
+  }, [daysOfMonth, times]);
 
   return (
     <View style={styles.container}>
@@ -130,11 +73,7 @@ export const MenScreen: React.FC = () => {
 
       <RNPickerSelect
         onValueChange={(value) => setSelectedService(value)}
-        items={[
-          { label: "Hair Cut & Shave", value: "hair_cut_shave" },
-          { label: "Hair Cut", value: "hair_cut" },
-          { label: "Shave", value: "shave" },
-        ]}
+        items={getServiceOptions()}
         style={pickerSelectStyles}
         placeholder={{ label: "Select a service...", value: null }}
       />
@@ -162,31 +101,40 @@ export const MenScreen: React.FC = () => {
           </TouchableOpacity>
         ))}
       </ScrollView>
-
       <ScrollView horizontal contentContainerStyle={styles.timeContainer}>
-        {times.map((time) => (
-          <TouchableOpacity
-            key={time}
-            style={[
-              styles.timeButton,
-              selectedTime === time && styles.selectedTimeButton,
-            ]}
-            onPress={() => handleTimeSelection(time)}
-          >
-            <Text
+        {times.map((time) => {
+          const isDisabled = disabledSlots.some(
+            (slot) => slot.day === selectedDay && slot.time === time
+          );
+          return (
+            <TouchableOpacity
+              key={time}
               style={[
-                styles.timeButtonText,
-                selectedTime === time && styles.selectedTimeButtonText,
+                styles.timeButton,
+                selectedTime === time && styles.selectedTimeButton,
+                isDisabled && styles.disabledTimeButton,
               ]}
+              onPress={() => !isDisabled && handleTimeSelection(time)}
+              disabled={isDisabled}
             >
-              {time}
+              <Text
+                style={[
+                  styles.timeButtonText,
+                  selectedTime === time && styles.selectedTimeButtonText,
+                  isDisabled && styles.disabledTimeButtonText,
+                ]}
+              >
+                {time}
             </Text>
           </TouchableOpacity>
-        ))}
+          );
+        })}
       </ScrollView>
-
       <View style={styles.selectionSummary}>
-        <Text>Selected Service: {selectedService || "None"}</Text>
+        <Text>
+          Selected Service:
+          {ServiceTypes[selectedService as keyof typeof ServiceTypes] || "None"}
+        </Text>
         <Text>Selected Day: {selectedDay || "None"}</Text>
         <Text>Selected Time: {selectedTime || "None"}</Text>
       </View>
@@ -226,15 +174,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#3b3f5c",
     borderRadius: 5,
     marginHorizontal: 5,
-    minWidth: width / 5 - 20,
-    alignItems: 'center',
-  },
-  dayButtonText: {
-    fontSize: 14,
-    color: "#f2f2f0",
+    minWidth: width * 0.15,
+    alignItems: "center",
   },
   selectedDayButton: {
-    backgroundColor: "#ff5e3a",
+    backgroundColor: "#f77f00",
+  },
+  dayButtonText: {
+    color: "#fff",
+    fontSize: 14,
   },
   selectedDayButtonText: {
     color: "#fff",
@@ -249,59 +197,64 @@ const styles = StyleSheet.create({
     backgroundColor: "#3b3f5c",
     borderRadius: 5,
     marginHorizontal: 5,
-    minWidth: width / 5 - 10,
-    alignItems: 'center',
-  },
-  timeButtonText: {
-    fontSize: 14,
-    color: "#f2f2f0",
+    minWidth: width * 0.15,
+    alignItems: "center",
   },
   selectedTimeButton: {
-    backgroundColor: "#ff5e3a",
+    backgroundColor: "#f77f00",
+  },
+  disabledTimeButton: {
+    backgroundColor: "#b0b0b0",
+  },
+  timeButtonText: {
+    color: "#fff",
+    fontSize: 14,
   },
   selectedTimeButtonText: {
     color: "#fff",
   },
+  disabledTimeButtonText: {
+    color: "#ddd",
+  },
   selectionSummary: {
     marginVertical: 20,
-    padding: 10,
-    backgroundColor: "#e0e0e0",
-    borderRadius: 10,
   },
   confirmButton: {
-    backgroundColor: "#ff5e3a",
-    paddingVertical: 15,
-    paddingHorizontal: 50,
-    borderRadius: 25,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.8,
-    shadowRadius: 3,
-    elevation: 5,
-    marginTop: 20,
+    padding: 15,
+    backgroundColor: "#2c365d",
+    borderRadius: 10,
+    alignItems: "center",
   },
   confirmButtonText: {
-    color: "#f2f2f0",
+    color: "#fff",
     fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
   },
 });
 
 const pickerSelectStyles = StyleSheet.create({
-  inputAndroid: {
+  inputIOS: {
     fontSize: 16,
     paddingVertical: 12,
     paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: "#272e4f",
+    borderColor: "gray",
     borderRadius: 4,
-    color: "#2c365d",
+    color: "black",
     paddingRight: 30,
+    backgroundColor: "#fff",
     marginBottom: 20,
-    width: width * 0.9,
-    textAlign: "center",
-    backgroundColor: "#f2f2f0",
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderWidth: 0.5,
+    borderColor: "purple",
+    borderRadius: 8,
+    color: "black",
+    paddingRight: 30,
+    backgroundColor: "#fff",
+    marginBottom: 20,
   },
 });
 
