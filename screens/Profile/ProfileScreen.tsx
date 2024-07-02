@@ -6,13 +6,12 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  Button,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
-import { signOut, onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from "../../firebase";
-import { saveUserData, getUserData, removeUserData } from "../../utils/storageUtils";
+import { saveUserData, getUserData } from "../../utils/storageUtils";
 
 export const ProfileScreen: React.FC = () => {
   const nav = useNavigation<NativeStackNavigationProp<any>>();
@@ -35,20 +34,6 @@ export const ProfileScreen: React.FC = () => {
 
     checkUser();
   }, []);
-  const goToLogin = async () => {
-    nav.navigate("LoginScreen");
-  }
-
-  const logout = async () => {
-    try {
-      await signOut(auth);
-      setUser(null);
-      await removeUserData();
-      goToLogin();  // Assuming you have a LoginScreen to navigate to
-    } catch (error) {
-      console.error('Error logging out', error);
-    }
-  };
 
   const goToWomenHairstyles = async () => {
     nav.navigate("WomenScreen", { hairStyle: "Women" });
@@ -68,7 +53,6 @@ export const ProfileScreen: React.FC = () => {
           contentContainerStyle={styles.scrollViewContainer}
         >
           <Text>Welcome, {user.email}!</Text>
-          <Button title="Logout" onPress={logout} />
           <TouchableOpacity style={styles.card} onPress={goToWomenHairstyles}>
             <Image
               source={require("../../assets/women_hairstyles.png")}
@@ -137,4 +121,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen
+export default ProfileScreen;
