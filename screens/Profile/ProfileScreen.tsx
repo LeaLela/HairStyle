@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,58 +6,97 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  Button,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { signOut, onAuthStateChanged } from 'firebase/auth';
+import { auth } from "../../firebase";
+import { saveUserData, getUserData, removeUserData } from "../../utils/storageUtils";
 
-
-export const ProfileScreen : React.FC = () => {  
+export const ProfileScreen: React.FC = () => {
   const nav = useNavigation<NativeStackNavigationProp<any>>();
-  const goToWomenHairstyles = () => {
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const savedUser = await getUserData();
+      if (savedUser) {
+        setUser(savedUser);
+      } else {
+        onAuthStateChanged(auth, (firebaseUser) => {
+          if (firebaseUser) {
+            setUser(firebaseUser);
+            saveUserData(firebaseUser);
+          }
+        });
+      }
+    };
+
+    checkUser();
+  }, []);
+  const goToLogin = async () => {
+    nav.navigate("LoginScreen");
+  }
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+      await removeUserData();
+      goToLogin();  // Assuming you have a LoginScreen to navigate to
+    } catch (error) {
+      console.error('Error logging out', error);
+    }
+  };
+
+  const goToWomenHairstyles = async () => {
     nav.navigate("WomenScreen", { hairStyle: "Women" });
   };
-
-  const goToMenHairstyles = () => {
+  const goToMenHairstyles = async () => {
     nav.navigate("MenScreen", { hairStyle: "Men" });
   };
-
-  const goToMyBookings = () => {
-    nav.navigate("MyBookingsScreen");
-  }
+  const goToMyBookings = async () => {
+    nav.navigate("MyBookings");
+  };
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollViewContainer}
-      >
-        <TouchableOpacity style={styles.card} onPress={goToWomenHairstyles}>
-          <Image
-            source={require("../../assets/women_hairstyles.png")}
-            style={styles.image}
-          />
-          <Text style={styles.cardTitle}>Women hairstyles</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={goToMenHairstyles}>
-          <Image
-            source={require("../../assets/men_hairstyles.png")}
-            style={styles.image}
-          />
-          <Text style={styles.cardTitle}>Men hairstyles</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.card} onPress={goToMyBookings}>
-          <Image
-            source={require("../../assets/my_bookings.png")}
-            style={styles.image}
-          />
-          <Text style={styles.cardTitle}>My bookings</Text>
-        </TouchableOpacity>
-      </ScrollView>
+      {user ? (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollViewContainer}
+        >
+          <Text>Welcome, {user.email}!</Text>
+          <Button title="Logout" onPress={logout} />
+          <TouchableOpacity style={styles.card} onPress={goToWomenHairstyles}>
+            <Image
+              source={require("../../assets/women_hairstyles.png")}
+              style={styles.image}
+            />
+            <Text style={styles.cardTitle}>Women hairstyles</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={goToMenHairstyles}>
+            <Image
+              source={require("../../assets/men_hairstyles.png")}
+              style={styles.image}
+            />
+            <Text style={styles.cardTitle}>Men hairstyles</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.card} onPress={goToMyBookings}>
+            <Image
+              source={require("../../assets/my_bookings.png")}
+              style={styles.image}
+            />
+            <Text style={styles.cardTitle}>My bookings</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      ) : (
+        <Text>Loading...</Text>
+      )}
     </View>
   );
 };
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -96,5 +135,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
   },
-
 });
+
+export default ProfileScreen

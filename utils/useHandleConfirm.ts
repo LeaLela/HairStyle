@@ -56,9 +56,6 @@ const nav = useNavigation<NativeStackNavigationProp<any>>();
       });
       return;
     }
-    const goToHome = async () => {
-      nav.navigate("Profile");
-    };
     try {
       const bookingRef = collection(db, "bookings");
       const docRef = await addDoc(bookingRef, {
