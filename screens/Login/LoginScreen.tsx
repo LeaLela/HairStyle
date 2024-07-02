@@ -15,6 +15,8 @@ import {
 import { getAuth, signInWithEmailAndPassword} from "firebase/auth";
 import {auth} from "../../firebase";
 import Toast from 'react-native-toast-message';
+import { getDoc, doc } from "firebase/firestore";
+import { db } from '../../firebase';
 
 
 export const LoginScreen: React.FC = () => {
@@ -31,6 +33,14 @@ export const LoginScreen: React.FC = () => {
     nav.navigate("Profile");
   };
 
+  const goToAdminScreen = () => {
+    nav.navigate("AdminScreen");
+  }
+
+  const getUserRole = async (uid: string) => {
+    const userDoc = await getDoc(doc(db, "users", uid));
+    return userDoc.exists() ? userDoc.data().role : "user";
+  };
   const handleLogin = async () => {
     if (!email || !password) {
       Toast.show({
@@ -43,7 +53,14 @@ export const LoginScreen: React.FC = () => {
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      goToHome();
+      const user = userCredential.user;
+      const role = await getUserRole(user.uid);
+
+      if (role === "admin") {
+        goToAdminScreen();
+      } else {
+        goToHome();
+      }
     } catch (error: any) {
       console.error(error);
       Toast.show({
@@ -54,59 +71,6 @@ export const LoginScreen: React.FC = () => {
     }
   };
 
-  // const handleLogin = async () => {
-  //   try {
-  //     const auth = getAuth();
-  //     if (email && password) {
-  //       const userCredential = await signInWithEmailAndPassword(
-  //         auth,
-  //         email,
-  //         password
-  //       );
-  //       goToHome();
-  //     } else {
-  //       console.error("Email and password are required");
-  //     }
-  //   } catch (error) {
-  //     error;
-  //   }
-  // };
-
-//   return (
-//     <Pressable style={styles.contentView} /*onPress={Keyboard.dismiss}*/>
-//       <SafeAreaView style={styles.contentView}>
-//         <View style={styles.container}>
-//           <View style={styles.titleContainer}>
-//             <Text style={styles.titleText}>Login</Text>
-//           </View>
-//           <View style={styles.mainContent}>
-//             <TextInput
-//               style={styles.loginTextField}
-//               placeholder="Email"
-//               placeholderTextColor={"white"}
-//               value={email}
-//               onChangeText={setEmail}
-//               autoCapitalize="none"
-//               inputMode="email"
-//             />
-//             <TextInput
-//               style={styles.loginTextField}
-//               placeholder="Password"
-//               placeholderTextColor={"white"}
-//               value={password}
-//               onChangeText={setPassword}
-//               secureTextEntry
-//             />
-//           </View>
-//           <View style={styles.buttonContainer}>
-//             <Button title="Login" onPress={handleLogin} />
-//             <Button title="Sign Up" onPress={goToRegistration} />
-//           </View>
-//         </View>
-//       </SafeAreaView>
-//     </Pressable>
-//   );
-// };
 return (
   <Pressable style={styles.contentView} /* onPress={Keyboard.dismiss}*/>
     <SafeAreaView style={styles.contentView}>
@@ -207,46 +171,3 @@ buttonText: {
   fontWeight: "bold",
 },
 });
-
-//PRIJAŠNJI GENERIC IZGLED
-// const styles = StyleSheet.create({
-//   contentView: {
-//     alignContent: "center",
-//     display: "flex",
-//     flex: 1,
-//     backgroundColor: "rgb(28 35 48)",
-//   },
-//   container: {
-//     flex: 1,
-//     paddingTop: 20,
-//   },
-//   titleContainer: {
-//     flex: 1.2,
-//     justifyContent: "center",
-//   },
-//   titleText: {
-//     fontSize: 45,
-//     textAlign: "center",
-//     fontWeight: "200",
-//     color: "white",
-//   },
-//   loginTextField: {
-//     borderBottomWidth: 1,
-//     height: 50,
-//     fontSize: 24,
-//     marginVertical: 10,
-//     fontWeight: "200",
-//     paddingLeft: 20,
-//     borderRadius: 10,
-//     backgroundColor: "black",
-//     color: "white",
-//   },
-//   mainContent: {
-//     flex: 6,
-//     padding: 20,
-//   },
-//   buttonContainer: {
-//     padding: 20,
-//     gap: 10,
-//   },
-// });

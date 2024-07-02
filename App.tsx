@@ -11,6 +11,7 @@ import { MenScreen } from "./screens/MenScreen/MenScreen";
 import { MyBookingsScreen } from "./screens/MyBookingsScreen/MyBookingsScreen";
 import Toast from 'react-native-toast-message';
 import { RootSiblingParent } from 'react-native-root-siblings';
+import {AdminScreen} from './screens/AdminScreen/AdminScreen';
 
 export type RootStackParamList = {
   WomenScreen: { hairStyle: "Women" };
@@ -117,7 +118,20 @@ export default function App() {
           },
         }}
         />
-     
+      
+      <Stack.Screen
+          name="AdminScreen"
+          component={AdminScreen}
+          options={{
+            title: "Admin",
+            headerShown: true,
+            headerTintColor: "#ff5e3a",
+            headerTitleStyle: { color: "white" },
+            headerStyle: {
+              backgroundColor: "rgb(28 35 48)",
+            },
+          }}
+        />
       </Stack.Navigator>
       <Toast/>
     </NavigationContainer>

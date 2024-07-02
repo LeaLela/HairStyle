@@ -16,6 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { collection, doc, setDoc } from "firebase/firestore";
 import Toast from 'react-native-toast-message';
+import { getDocs, query, limit } from "firebase/firestore";
 
 
 
@@ -35,20 +36,7 @@ export const RegisterScreen: React.FC = () => {
     nav.navigate("Login");
   };
 
-  // const createProfile = async (response: any) => {
-  //   const usersCollection = collection(db, "users");
-  //   const userDoc = doc(usersCollection, response.user.email);
-
-  //   await setDoc(userDoc, {
-  //     name,
-  //     lastName,
-  //     phoneNumber,
-  //     email,
-  //   });
-
-  //   console.log("User profile created successfully");
-  // };
- const createProfile = async (response: any) => {
+ const createProfile = async (response: any, role: string) => {
     const usersCollection = collection(db, "users");
     const userDoc = doc(usersCollection, response.user.uid);
   
@@ -58,7 +46,8 @@ export const RegisterScreen: React.FC = () => {
       Email,
       Telefon,
       Spol,
-      Datum_rodjenja
+      Datum_rodjenja,
+      role
     });
   
     console.log("User profile created successfully", usersCollection, userDoc, response.user.uid);
@@ -120,24 +109,21 @@ export const RegisterScreen: React.FC = () => {
       });
       return false;
     }
-    // Additional validation for email format, password length, etc. can be added here
     return true;
   };
   const registerAndGoToMainFlow = async () => {
     if (!validateFields()) {
       return;
     }
-    // if (!Ime || !Email || !Lozinka || !Prezime || !Telefon || !Spol || !Datum_rodjenja) {
-    //   Alert.alert("Error", "Please fill in all fields");
-    //   return;
-    // }
+ 
     try {
       const response = await createUserWithEmailAndPassword(
         auth,
         Email,
         Lozinka
       );
-      createProfile(response);
+      const isFirstUser = (await getDocs(query(collection(db, "users"), limit(1)))).empty;
+      createProfile(response, isFirstUser ? "admin" : "user");
       setFirstName("");
       setLastName("");
       setPhoneNumber("");
@@ -163,39 +149,6 @@ export const RegisterScreen: React.FC = () => {
       });
     }
   };
-
- 
-  
-
-  // const handleRegister = async () => {
-  //   if (Ime && Prezime && Email && Lozinka && Datum_rodjenja && Telefon && Spol) {
-  //     await createUserWithEmailAndPassword(auth, Email, Email);
-  //     alert("User registered successfully!");
-  //     setFirstName("");
-  //     setLastName("");
-  //     setEmail("");
-  //     setPassword("");
-  //     setBirthDate("");
-  //     setPhoneNumber("");
-  //     setGender("");
-  //     fetchUsers(); // Refresh user list after registration
-  //     console.log("Test12")
-  //   } else {
-  //     alert("Please fill in all fields");
-  //     console.log("Err")
-  //   }
-  //   getUsers();
-  //   console.log("Success")
-  // };
-
-  // const fetchUsers = async () => {
-  //   const users = await getUsers( );
-  //   setUsers(users);
-  // };
-
-  // useEffect(() => {
-  //   fetchUsers();
-  // }, []);
 
   return (
     <View style={styles.container}>
@@ -313,118 +266,3 @@ const styles = StyleSheet.create({
 });
 
 export default RegisterScreen;
-
-
-
-
-
-  //PRIJASNJI GENERIC IZGLED
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.label}>First Name</Text>
-//       <TextInput
-//         style={styles.input}
-//         value={Ime}
-//         onChangeText={setFirstName}
-//         placeholder="Enter first name"
-//       />
-//       <Text style={styles.label}>Last Name</Text>
-//       <TextInput
-//         style={styles.input}
-//         value={Prezime}
-//         onChangeText={setLastName}
-//         placeholder="Enter last name"
-//       />
-//       <Text style={styles.label}>Email</Text>
-//       <TextInput
-//         style={styles.input}
-//         value={Email}
-//         onChangeText={setEmail}
-//         placeholder="Enter email"
-//         keyboardType="email-address"
-//       />
-//       <Text style={styles.label}>Lozinka</Text>
-//       <TextInput
-//         style={styles.input}
-//         value={Lozinka}
-//         onChangeText={setPassword} // Ažuriranje stanja lozinke
-//         placeholder="Unesite lozinku"
-//         secureTextEntry={true} // Skrivanje unosa lozinke
-//       />
-//       <Text style={styles.label}>Datum rođenja</Text>
-//       <TextInput
-//         style={styles.input}
-//         value={Datum_rodjenja}
-//         onChangeText={setBirthDate} // Ažuriranje stanja datuma rođenja
-//         placeholder="DD.MM.YYYY"
-//         keyboardType="numeric" // Postavljanje tipkovnice za numerički unos
-//       />
-//       <Text style={styles.label}>Phone Number</Text>
-//       <TextInput
-//         style={styles.input}
-//         value={Telefon}
-//         onChangeText={setPhoneNumber}
-//         keyboardType="phone-pad"
-//         placeholder="Enter phone number"
-//       />
-//       <Text style={styles.label}>Gender</Text>
-//       <TextInput
-//         style={styles.input}
-//         value={Spol}
-//         onChangeText={setGender}
-//         placeholder="Enter gender"
-//       />
-//       <Button title="Register" onPress={registerAndGoToMainFlow} />
-//       <FlatList
-//         data={users}
-//         keyExtractor={(item) => item.id}
-//         renderItem={({ item }) => (
-//           <View>
-//             <Text>
-//               {item.Ime} {item.Prezime}
-//             </Text>
-//             <Text>{item.Email}</Text>
-//           </View>
-//         )}
-//       />
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   // container: {
-//   //   flex: 1,
-//   //   padding: 20,
-//   // },
-//   // label: {
-//   //   fontSize: 16,
-//   //   marginBottom: 8,
-//   // },
-//   // input: {
-//   //   height: 40,
-//   //   borderColor: "gray",
-//   //   borderWidth: 1,
-//   //   marginBottom: 12,
-//   //   paddingHorizontal: 8,
-//   // }
-//   container: {
-//     flex: 1,
-//     padding: 20,
-//     backgroundColor: '#f5f5f5', // Adds a light gray background color to the container
-//   },
-//   label: {
-//     fontSize: 16,
-//     color: '#333', // Dark gray color for better readability
-//     marginBottom: 8,
-//     fontWeight: 'bold', // Makes the label text bold
-//   },
-//   input: {
-//     height: 40,
-//     borderColor: '#ccc', // Lighter gray border color for the input
-//     borderWidth: 1,
-//     marginBottom: 12,
-//     paddingHorizontal: 8,
-//     borderRadius: 5, // Rounded corners for the input field
-//     backgroundColor: '#fff', // White background for the input field
-//   }
-// });
