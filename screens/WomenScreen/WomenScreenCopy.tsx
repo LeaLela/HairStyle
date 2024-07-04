@@ -9,9 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db, auth } from "../../firebase";
+import { db } from "../../firebase";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import { useHandleConfirm } from "../../utils/useHandleConfirm";

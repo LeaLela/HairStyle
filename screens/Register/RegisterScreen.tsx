@@ -8,8 +8,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Alert,
+  StyleSheet
 } from "react-native";
 import { auth, db } from "../../firebase";
 import Toast from "react-native-toast-message";

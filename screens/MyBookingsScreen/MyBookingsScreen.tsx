@@ -6,7 +6,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   Dimensions,
 } from "react-native";
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
