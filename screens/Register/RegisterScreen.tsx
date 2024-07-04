@@ -17,7 +17,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { collection, doc, setDoc } from "firebase/firestore";
 import Toast from 'react-native-toast-message';
 import { getDocs, query, limit } from "firebase/firestore";
-
+import { TextInputMask } from "react-native-masked-text";
+import { Picker } from '@react-native-picker/picker';
 
 
 export const RegisterScreen: React.FC = () => {
@@ -183,21 +184,27 @@ export const RegisterScreen: React.FC = () => {
         placeholderTextColor="#999"
         secureTextEntry={true}
       />
-      <TextInput
-        style={styles.input}
+      <TextInputMask
+        type={'datetime'}
+        options={{
+          format: 'DD.MM.YYYY'
+        }}
         value={Datum_rodjenja}
         onChangeText={setBirthDate}
+        style={styles.input}
         placeholder="Birth Date (DD.MM.YYYY)"
         placeholderTextColor="#999"
         keyboardType="numeric"
       />
-      <TextInput
+      <Picker
+        selectedValue={Spol}
         style={styles.input}
-        value={Spol}
-        onChangeText={setGender}
-        placeholder="Gender"
-        placeholderTextColor="#999"
-      />
+        onValueChange={(itemValue:string) => setGender(itemValue)}
+      >
+        <Picker.Item label="Select Gender" value="" />
+        <Picker.Item label="Male" value="male" />
+        <Picker.Item label="Female" value="female" />
+      </Picker>
       <TextInput
         style={styles.input}
         value={Telefon}

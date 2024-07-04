@@ -12,6 +12,7 @@ import {
 import { collection, query, getDocs, deleteDoc, doc, updateDoc, where } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Toast from "react-native-toast-message";
+import Role from "../Enums/user_role";
 
 const { width } = Dimensions.get("window");
 
@@ -79,18 +80,18 @@ export const AdminScreen: React.FC = () => {
     try {
       const usersCollection = collection(db, 'users');
       const userSnapshot = await getDocs(query(usersCollection, where("email", "==", newAdminEmail)));
-      const userDoc = userSnapshot.docs[0];
-
-      if (userDoc) {
-        await updateDoc(doc(db, 'users', userDoc.id), { role: 'admin' });
-        Toast.show({
-          type: 'success',
-          text1: 'Success',
-          text2: `User ${newAdminEmail} is now an admin`,
-        });
-      } else {
+      if (userSnapshot.empty) {
         Alert.alert('Error', 'User not found');
+        return;
       }
+
+      const userDoc = userSnapshot.docs[0];
+      await updateDoc(doc(db, 'users', userDoc.id), { role: Role.Admin });
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: `User ${newAdminEmail} is now an admin`,
+      });
     } catch (error: any) {
       console.error(error);
       Toast.show({
@@ -117,7 +118,6 @@ export const AdminScreen: React.FC = () => {
               <Text style={styles.bookingText}>Time: {reservation.time}</Text>
               <Text style={styles.bookingText}>Hair Style: {reservation.hairStyle}</Text>
               <Text style={styles.bookingText}>User ID: {reservation.userId}</Text>
-              
               <TouchableOpacity
                 style={styles.cancelButton}
                 onPress={() => handleDeleteReservation(reservation.id)}
