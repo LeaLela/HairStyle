@@ -1,5 +1,4 @@
 import {
-  Button,
   Image,
   StyleSheet,
   Text,
@@ -7,7 +6,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect } from "react";
-import { Link, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 // import { getAuth } from "firebase/auth";
 
@@ -20,15 +19,6 @@ export const HomePage: React.FC = () => {
   const goToLogin = async () => {
     nav.navigate("Login");
   };
-
-  // const user = getAuth().currentUser;
-  // console.log(user?.phoneNumber);
-  // useEffect(() => {
-  //   if (user) {
-  //     nav.navigate("Home");
-  //   }
-  // }),
-  //   [user];
 
   return (
     <View style={styles.container}>
@@ -68,7 +58,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    opacity: 0.4, // Prozirnost za efektan izgled
+    opacity: 0.4,
     zIndex: -1,
   },
   container: {
@@ -76,7 +66,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#f2f2f0", // Tamna pozadina za moderan izgled
+    backgroundColor: "#f2f2f0",
   },
   gsLogo: {
     width: 150,

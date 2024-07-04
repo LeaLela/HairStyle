@@ -3,7 +3,6 @@ import { getAuth } from "firebase/auth";
 import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from "firebase/firestore";
 import { ref } from "firebase/database";
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCEu9KXACzpwL-UhBsKubfIVjYdFh35mVg",
   authDomain: "hairstylecalendar.firebase.com",
@@ -13,7 +12,7 @@ const firebaseConfig = {
   appId: "1:648004642153:android:6921b68a7c0ae0441cc9f8",
 };
 
-// Initialize Firebase
+
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);

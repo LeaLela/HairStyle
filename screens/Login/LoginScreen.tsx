@@ -3,21 +3,14 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import React, { useState } from "react";
 import { auth, db } from "../../firebase";
 import {
-  SafeAreaView,
   View,
   Text,
   StyleSheet,
   TextInput,
   Pressable,
-  Keyboard,
-  Alert,
-  Button,
 } from "react-native";
 import {
-  getAuth,
-  signInWithEmailAndPassword,
-  UserCredential,
-  getIdTokenResult
+  signInWithEmailAndPassword
 } from "firebase/auth";
 import Toast from "react-native-toast-message";
 import { doc, getDoc } from "firebase/firestore";
