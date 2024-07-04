@@ -14,7 +14,7 @@ import { db, auth } from "../../firebase";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import { useHandleConfirm } from "../../utils/useHandleConfirm";
-import { ServiceTypes, getServiceOptions } from "../../utils/serviceTypes";
+import { ServiceTypesMen, getServiceOptions } from "../../utils/serviceTypesMen";
 import { useDateAndTime, useUserData } from "../../hooks/hooks";
 import { getDisabledSlots } from "../../utils/getDisableSlots";
 
@@ -126,7 +126,7 @@ export const MenScreen: React.FC = () => {
       <View style={styles.selectionSummary}>
         <Text>
           Selected Service:
-          {ServiceTypes[selectedService as keyof typeof ServiceTypes] || "None"}
+          {ServiceTypesMen[selectedService as keyof typeof ServiceTypesMen] || "None"}
         </Text>
         <Text>Selected Day: {selectedDay || "None"}</Text>
         <Text>Selected Time: {selectedTime || "None"}</Text>

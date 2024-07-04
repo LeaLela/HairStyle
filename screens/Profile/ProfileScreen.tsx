@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase";
 import { saveUserData, getUserData } from "../../utils/storageUtils";
 

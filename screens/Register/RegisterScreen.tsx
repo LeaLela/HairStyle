@@ -1,25 +1,21 @@
-// src/RegisterScreen.tsx
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import React, { useState, useEffect } from "react";
+import { collection, doc, setDoc, getDocs, query, limit } from "firebase/firestore";
+import React, { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
   View,
   Text,
   TextInput,
-  Button,
-  FlatList,
-  StyleSheet,
   TouchableOpacity,
+  StyleSheet,
   Alert,
 } from "react-native";
 import { auth, db } from "../../firebase";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { collection, doc, setDoc } from "firebase/firestore";
-import Toast from 'react-native-toast-message';
-import { getDocs, query, limit } from "firebase/firestore";
+import Toast from "react-native-toast-message";
+import Role from "../Enums/user_role";
 import { TextInputMask } from "react-native-masked-text";
-import { Picker } from '@react-native-picker/picker';
-
+import { Picker } from "@react-native-picker/picker";
 
 export const RegisterScreen: React.FC = () => {
   const [Ime, setFirstName] = useState("");
@@ -29,18 +25,17 @@ export const RegisterScreen: React.FC = () => {
   const [Datum_rodjenja, setBirthDate] = useState("");
   const [Telefon, setPhoneNumber] = useState("");
   const [Spol, setGender] = useState("");
-  const [users, setUsers] = useState<any[]>([]);
-
 
   const nav = useNavigation<NativeStackNavigationProp<any>>();
+  
   const goToLogin = async () => {
     nav.navigate("Login");
   };
 
- const createProfile = async (response: any, role: string) => {
+  const createProfile = async (response: any, role: Role) => {
     const usersCollection = collection(db, "users");
     const userDoc = doc(usersCollection, response.user.uid);
-  
+
     await setDoc(userDoc, {
       Ime,
       Prezime,
@@ -48,83 +43,39 @@ export const RegisterScreen: React.FC = () => {
       Telefon,
       Spol,
       Datum_rodjenja,
-      role
+      role, 
     });
-  
-    console.log("User profile created successfully", usersCollection, userDoc, response.user.uid);
+
+    console.log("User profile created successfully with role:", role);
   };
-  const validateFields = () => {
-    if (!Ime) {
-      Toast.show({
-        type: 'error',
-        text1: 'Validation Error',
-        text2: 'First Name is required.'
-      });
-      return false;
-    }
-    if (!Prezime) {
-      Toast.show({
-        type: 'error',
-        text1: 'Validation Error',
-        text2: 'Last Name is required.'
-      });
-      return false;
-    }
-    if (!Email) {
-      Toast.show({
-        type: 'error',
-        text1: 'Validation Error',
-        text2: 'Email is required.'
-      });
-      return false;
-    }
-    if (!Lozinka) {
-      Toast.show({
-        type: 'error',
-        text1: 'Validation Error',
-        text2: 'Password is required.'
-      });
-      return false;
-    }
-    if (!Datum_rodjenja) {
-      Toast.show({
-        type: 'error',
-        text1: 'Validation Error',
-        text2: 'Birth Date is required.'
-      });
-      return false;
-    }
-    if (!Telefon) {
-      Toast.show({
-        type: 'error',
-        text1: 'Validation Error',
-        text2: 'Phone Number is required.'
-      });
-      return false;
-    }
-    if (!Spol) {
-      Toast.show({
-        type: 'error',
-        text1: 'Validation Error',
-        text2: 'Gender is required.'
-      });
-      return false;
-    }
-    return true;
-  };
+
   const registerAndGoToMainFlow = async () => {
-    if (!validateFields()) {
+    if (
+      !Ime ||
+      !Email ||
+      !Lozinka ||
+      !Prezime ||
+      !Telefon ||
+      !Spol ||
+      !Datum_rodjenja
+    ) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please fill in all fields",
+      });
       return;
     }
- 
     try {
       const response = await createUserWithEmailAndPassword(
         auth,
         Email,
         Lozinka
       );
+
       const isFirstUser = (await getDocs(query(collection(db, "users"), limit(1)))).empty;
-      createProfile(response, isFirstUser ? "admin" : "user");
+
+      createProfile(response, isFirstUser ? Role.Admin : Role.User);
       setFirstName("");
       setLastName("");
       setPhoneNumber("");
@@ -132,21 +83,18 @@ export const RegisterScreen: React.FC = () => {
       setPassword("");
       setBirthDate("");
       setGender("");
-      goToLogin();
-
-      // Pokaži Toast obavijest nakon uspješne registracije
       Toast.show({
-        type: 'success',
-        text1: 'Registration Successful',
-        text2: 'You have successfully registered.'
+        type: "success",
+        text1: "Success",
+        text2: "You have successfully registered",
       });
-
+      goToLogin();
     } catch (error: any) {
       console.log(error);
       Toast.show({
-        type: 'error',
-        text1: 'Registration Failed',
-        text2: error.message
+        type: "error",
+        text1: "Registration Failed",
+        text2: error.message || "Something went wrong",
       });
     }
   };
@@ -185,9 +133,9 @@ export const RegisterScreen: React.FC = () => {
         secureTextEntry={true}
       />
       <TextInputMask
-        type={'datetime'}
+        type={"datetime"}
         options={{
-          format: 'DD.MM.YYYY'
+          format: "DD.MM.YYYY",
         }}
         value={Datum_rodjenja}
         onChangeText={setBirthDate}
@@ -199,7 +147,7 @@ export const RegisterScreen: React.FC = () => {
       <Picker
         selectedValue={Spol}
         style={styles.input}
-        onValueChange={(itemValue:string) => setGender(itemValue)}
+        onValueChange={(itemValue: string) => setGender(itemValue)}
       >
         <Picker.Item label="Select Gender" value="" />
         <Picker.Item label="Male" value="male" />
@@ -213,7 +161,6 @@ export const RegisterScreen: React.FC = () => {
         placeholderTextColor="#999"
         keyboardType="phone-pad"
       />
-
       <TouchableOpacity style={styles.button} onPress={registerAndGoToMainFlow}>
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
@@ -233,32 +180,27 @@ const styles = StyleSheet.create({
     backgroundColor: "#f2f2f0",
   },
   title: {
-    fontSize: 24,
+    fontSize: 36,
+    fontWeight: "bold",
     color: "#2c365d",
     marginBottom: 20,
-    fontWeight: "bold",
   },
   input: {
-    height: 50,
     width: "100%",
+    height: 50,
+    fontSize: 18,
+    borderBottomWidth: 1,
     borderColor: "#ccc",
-    borderWidth: 1,
     marginBottom: 20,
-    paddingHorizontal: 15,
-    borderRadius: 25,
-    backgroundColor: "#fff",
-    fontSize: 16,
+    paddingLeft: 10,
   },
   button: {
+    width: "100%",
+    height: 50,
     backgroundColor: "#ff5e3a",
-    paddingVertical: 15,
-    paddingHorizontal: 50,
     borderRadius: 25,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.8,
-    shadowRadius: 3,
-    elevation: 5,
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 20,
   },
   buttonText: {

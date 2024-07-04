@@ -18,6 +18,7 @@ import { getUserData, saveUserData, removeUserData } from './utils/storageUtils'
 import Role from './screens/Enums/user_role';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
+import { TouchableOpacity, Image } from 'react-native';
 
 export type RootStackParamList = {
   WomenScreen: { hairStyle: "Women" };
@@ -98,11 +99,12 @@ const App = () => {
                     backgroundColor: "rgb(28 35 48)",
                   },
                   headerRight: () => (
-                    <Button
-                      onPress={handleLogout}
-                      title="Logout"
-                      color="#ff5e3a"
-                    />
+                    <TouchableOpacity onPress={handleLogout}>
+                      <Image
+                        source={require("../HairStyleCalendar/assets/logout.png")} 
+                        style={{ width: 20, height: 20, marginRight: 10 }} 
+                      />
+                    </TouchableOpacity>
                   ),
                 }}
               />
@@ -120,11 +122,12 @@ const App = () => {
                       backgroundColor: "rgb(28 35 48)",
                     },
                     headerRight: () => (
-                      <Button
-                        onPress={handleLogout}
-                        title="Logout"
-                        color="#ff5e3a"
-                      />
+                      <TouchableOpacity onPress={handleLogout}>
+                        <Image
+                          source={require("../HairStyleCalendar/assets/logout.png")} 
+                          style={{ width: 20, height: 20, marginRight: 10 }} 
+                        />
+                      </TouchableOpacity>
                     ),
                   }}
                 />
