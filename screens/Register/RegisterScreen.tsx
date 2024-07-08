@@ -208,7 +208,7 @@ export const RegisterScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f2f2f0",
+    backgroundColor: "#1c2330",
     padding: 20,
   },
   headerContainer: {
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 20,
-    color: "#2c365d",
+    color: "#f2f2f0",
     marginHorizontal: 15,
   },
   activeTab: {

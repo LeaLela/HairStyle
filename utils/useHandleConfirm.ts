@@ -1,8 +1,6 @@
 import { useCallback, useState } from "react";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { validateSelection } from "./validations";
-import { ServiceTypes } from "./serviceTypes";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp, NativeStackNavigatorProps } from "@react-navigation/native-stack/lib/typescript/src/types";
 
@@ -71,7 +69,7 @@ export const useHandleConfirm = (
         text1: "Booking Confirmed",
         text2: `Your booking ID is ${docRef.id}`,
       });
-      navigation.navigate("Profil");
+      navigation.navigate("Profile");
     } catch (e) {
       console.error("Error adding document: ", e);
       Toast.show({

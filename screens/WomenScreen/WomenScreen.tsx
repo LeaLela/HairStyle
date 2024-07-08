@@ -57,19 +57,12 @@ export const WomenScreenCopy: React.FC = () => {
 
     fetchDisabledSlots();
   }, [daysOfMonth, times]);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Booking</Text>
+      <Text style={styles.title}>Appointment</Text>
 
-      <RNPickerSelect
-        onValueChange={(value) => setSelectedService(value)}
-        items={getServiceOptions()}
-        style={pickerSelectStyles}
-        placeholder={{ label: "Select a service...", value: null }}
-      />
-
-      <Text style={styles.subtitle}>Select Date & Time</Text>
-
+      <Text style={styles.subtitle}>Calendar</Text>
       <ScrollView horizontal contentContainerStyle={styles.dateContainer}>
         {daysOfMonth.map((day) => (
           <TouchableOpacity
@@ -88,10 +81,12 @@ export const WomenScreenCopy: React.FC = () => {
             >
               {day}
             </Text>
+           
           </TouchableOpacity>
         ))}
       </ScrollView>
 
+      <Text style={styles.subtitle}>Available Slots</Text>
       <ScrollView horizontal contentContainerStyle={styles.timeContainer}>
         {times.map((time) => {
           const isDisabled = disabledSlots.some(
@@ -122,14 +117,14 @@ export const WomenScreenCopy: React.FC = () => {
         })}
       </ScrollView>
 
-      <View style={styles.selectionSummary}>
-        <Text>
-          Selected Service:
-          {ServiceTypes[selectedService as keyof typeof ServiceTypes] || "None"}
-        </Text>
-        <Text>Selected Day: {selectedDay || "None"}</Text>
-        <Text>Selected Time: {selectedTime || "None"}</Text>
-      </View>
+      <Text style={styles.subtitle}>Choose Services</Text>
+      <RNPickerSelect
+        onValueChange={(value) => setSelectedService(value)}
+        items={getServiceOptions()}
+        style={pickerSelectStyles}
+        placeholder={{ label: "Select a service...", value: null }}
+        useNativeAndroidPickerStyle={false}
+      />
 
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
         <Text style={styles.confirmButtonText}>Confirm</Text>
@@ -142,18 +137,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f2f2f0",
+    backgroundColor: "#1c2330",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#2c365d",
+    color: "#ffffff",
     textAlign: "center",
     marginBottom: 20,
   },
   subtitle: {
     fontSize: 18,
-    color: "#2c365d",
+    color: "#ffffff",
     marginVertical: 10,
   },
   dateContainer: {
@@ -161,64 +156,73 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   dayButton: {
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 12,
-    backgroundColor: "#3b3f5c",
-    borderRadius: 5,
+    backgroundColor: "#272e4f",
+    borderRadius: 12,
     marginHorizontal: 5,
-    minWidth: width * 0.15,
     alignItems: "center",
+    justifyContent: "center",
+    borderColor: "#3a3a3c",
+    borderWidth: 1,
+    minWidth: width * 0.18,
   },
   selectedDayButton: {
-    backgroundColor: "#f77f00",
+    backgroundColor: "#ff5e3a",
+    borderColor: "#ff9500",
   },
   dayButtonText: {
-    color: "#fff",
-    fontSize: 14,
+    color: "#ffffff",
+    fontSize: 16,
+    textAlign: "center",
   },
   selectedDayButtonText: {
-    color: "#fff",
+    color: "#000000",
   },
   timeContainer: {
     flexDirection: "row",
     marginBottom: 20,
   },
   timeButton: {
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 12,
-    backgroundColor: "#3b3f5c",
-    borderRadius: 5,
+    backgroundColor: "#272e4f",
+    borderRadius: 12,
     marginHorizontal: 5,
-    minWidth: width * 0.15,
     alignItems: "center",
+    justifyContent: "center",
+    borderColor: "#3a3a3c",
+    borderWidth: 1,
+    minWidth: width * 0.18,
   },
   selectedTimeButton: {
-    backgroundColor: "#f77f00",
+    backgroundColor: "#ff5e3a",
+    borderColor: "#ff9500",
   },
   disabledTimeButton: {
-    backgroundColor: "#b0b0b0",
+    backgroundColor: "#3a3a3c",
+    borderColor: "#3a3a3c",
   },
   timeButtonText: {
-    color: "#fff",
-    fontSize: 14,
+    color: "#ffffff",
+    fontSize: 16,
+    textAlign: "center",
   },
   selectedTimeButtonText: {
-    color: "#fff",
+    color: "#000000",
   },
   disabledTimeButtonText: {
-    color: "#ddd",
-  },
-  selectionSummary: {
-    marginVertical: 20,
+    color: "#a0a0a0",
   },
   confirmButton: {
     padding: 15,
-    backgroundColor: "#2c365d",
-    borderRadius: 10,
+    backgroundColor: "#ff5e3a",
+    borderRadius: 12,
     alignItems: "center",
+    marginTop: 20,
   },
   confirmButtonText: {
-    color: "#fff",
+    color: "#000000",
     fontSize: 18,
   },
 });
@@ -230,22 +234,31 @@ const pickerSelectStyles = StyleSheet.create({
     paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: "gray",
-    borderRadius: 4,
+    borderRadius: 12,
     color: "black",
     paddingRight: 30,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
     marginBottom: 20,
+    textAlign: "center",
   },
   inputAndroid: {
     fontSize: 16,
-    paddingVertical: 8,
+    paddingVertical: 12,
     paddingHorizontal: 10,
-    borderWidth: 0.5,
-    borderColor: "purple",
-    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "gray",
+    borderRadius: 12,
     color: "black",
     paddingRight: 30,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  viewContainer: {
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    borderColor: "#e0e0e0",
+    borderWidth: 1,
     marginBottom: 20,
   },
 });

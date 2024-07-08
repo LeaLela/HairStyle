@@ -45,38 +45,45 @@ export const ProfileScreen: React.FC = () => {
     nav.navigate("MyBookings");
   };
 
+  
   return (
     <View style={styles.container}>
+      <Text style={styles.headerText}>Services</Text>
       {user ? (
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollViewContainer}
         >
-          <Text>Welcome, {user.email}!</Text>
           <TouchableOpacity style={styles.card} onPress={goToWomenHairstyles}>
-            <Image
-              source={require("../../assets/women_hairstyles.png")}
-              style={styles.image}
-            />
-            <Text style={styles.cardTitle}>Women hairstyles</Text>
+            <View style={styles.cardInner}>
+              <Image
+                source={require("../../assets/women_hairstyles.png")}
+                style={styles.cardImage}
+              />
+              <Text style={styles.cardTitle}>Women Hairstyles</Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card} onPress={goToMenHairstyles}>
-            <Image
-              source={require("../../assets/men_hairstyles.png")}
-              style={styles.image}
-            />
-            <Text style={styles.cardTitle}>Men hairstyles</Text>
+            <View style={styles.cardInner}>
+              <Image
+                source={require("../../assets/men_hairstyles.png")}
+                style={styles.cardImage}
+              />
+              <Text style={styles.cardTitle}>Men Hairstyles</Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.card} onPress={goToMyBookings}>
-            <Image
-              source={require("../../assets/my_bookings.png")}
-              style={styles.image}
-            />
-            <Text style={styles.cardTitle}>My bookings</Text>
+            <View style={styles.cardInner}>
+              <Image
+                source={require("../../assets/my_bookings.png")}
+                style={styles.cardImage}
+              />
+              <Text style={styles.cardTitle}>My Bookings</Text>
+            </View>
           </TouchableOpacity>
         </ScrollView>
       ) : (
-        <Text>Loading...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       )}
     </View>
   );
@@ -85,39 +92,52 @@ export const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f2f2f0",
+    backgroundColor: "#1c2330",
+    paddingHorizontal: 20,
+  },
+  headerText: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#f2f2f0",
+    marginVertical: 20,
+    textAlign: "center",
+  },
+  loadingText: {
+    fontSize: 18,
+    color: "#F2AA4C",
+    textAlign: "center",
   },
   scrollViewContainer: {
     alignItems: "center",
   },
   card: {
-    width: 250,
-    height: 300,
-    margin: 10,
-    backgroundColor: "#e43a19",
-    borderRadius: 20,
+    width: "100%",
+    borderRadius: 10,
+    marginBottom: 20,
+    backgroundColor: "#272e4f",
     padding: 20,
-    justifyContent: "center",
-    alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 8,
+    overflow: "hidden",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cardInner: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cardImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 20,
   },
   cardTitle: {
-    color: "#000000",
     fontSize: 18,
     fontWeight: "bold",
-    marginTop: 10,
-  },
-  image: {
-    width: "100%",
-    height: "80%",
-    borderRadius: 10,
-    marginBottom: 10,
+    color: "#f2f2f0",
   },
 });
-
