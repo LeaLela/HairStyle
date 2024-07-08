@@ -248,5 +248,3 @@ const pickerSelectStyles = StyleSheet.create({
     marginBottom: 20,
   },
 });
-
-export default MenScreen;

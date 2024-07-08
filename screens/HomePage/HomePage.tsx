@@ -5,10 +5,9 @@ import {
   View,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-// import { getAuth } from "firebase/auth";
 
 export const HomePage: React.FC = () => {
   const nav = useNavigation<NativeStackNavigationProp<any>>();

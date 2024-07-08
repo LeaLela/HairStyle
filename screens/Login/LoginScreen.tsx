@@ -91,33 +91,37 @@ export const LoginScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#ccc"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#ccc"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      <View style={styles.headerContainer}>
+        <Text style={[styles.headerText, styles.activeTab]}>Login</Text>
+        <Pressable onPress={goToRegistration}>
+          <Text style={styles.headerText}>Register</Text>
+        </Pressable>
+      </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#ccc"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#ccc"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+      </View>
       <Pressable style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </Pressable>
       <Pressable style={styles.googleButton} onPress={signInWithGoogle}>
         <Image source={require("../../assets/google.png")} style={styles.googleIcon} />
-        <Text style={styles.googleButtonText}>Sign in with Google</Text>
-      </Pressable>
-      <Pressable style={styles.signupLink} onPress={goToRegistration}>
-        <Text style={styles.signupText}>Don't have an account? Sign up</Text>
+        <Text style={styles.googleButtonText}>Login with Google</Text>
       </Pressable>
     </View>
   );
@@ -131,11 +135,32 @@ const styles = StyleSheet.create({
     backgroundColor: "#f2f2f0",
     padding: 20,
   },
-  title: {
-    fontSize: 36,
-    fontWeight: "bold",
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 30,
+  },
+  headerText: {
+    fontSize: 20,
     color: "#2c365d",
+    marginHorizontal: 15,
+  },
+  activeTab: {
+    fontWeight: "bold",
+    borderBottomWidth: 2,
+    borderBottomColor: "#ff5e3a",
+  },
+  inputContainer: {
+    width: "100%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
     marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
   },
   input: {
     width: "100%",
@@ -182,13 +207,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  signupLink: {
-    marginBottom: 20,
-  },
-  signupText: {
-    color: "#2c365d",
-    fontSize: 16,
-  },
 });
 
-export default LoginScreen;
