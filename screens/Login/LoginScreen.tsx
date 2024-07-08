@@ -29,8 +29,8 @@ export const LoginScreen: React.FC = () => {
     nav.push("Register");
   };
 
-  const goToHome = async () => {
-    nav.navigate("Profil");
+  const goToHome = () => {
+    nav.navigate("Profile");
   };
 
   const getUserRole = async (uid: string) => {

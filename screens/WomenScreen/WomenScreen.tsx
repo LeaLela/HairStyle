@@ -46,7 +46,7 @@ export const WomenScreenCopy: React.FC = () => {
     selectedTime,
     userId,
     route.params.hairStyle,
-    db
+    db,
   );
 
   useEffect(() => {

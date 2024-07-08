@@ -111,7 +111,7 @@ const App = () => {
             ) : (
               <>
                 <Stack.Screen
-                  name="Profil"
+                  name="Profile"
                   component={ProfileScreen}
                   options={{
                     title: "Profile",

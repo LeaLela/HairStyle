@@ -13,6 +13,10 @@ export const useHandleConfirm = (
   db: any
 ) => {
     const navigation = useNavigation<NativeStackNavigationProp<any>>();
+
+    const goToHome = () => {
+      navigation.navigate("Profile");
+    }
   return useCallback(async () => {
     if (
       !["hair_cut_color", "hair_cut", "hair_color"].includes(
@@ -69,7 +73,7 @@ export const useHandleConfirm = (
         text1: "Booking Confirmed",
         text2: `Your booking ID is ${docRef.id}`,
       });
-      navigation.navigate("Profile");
+     goToHome();
     } catch (e) {
       console.error("Error adding document: ", e);
       Toast.show({
