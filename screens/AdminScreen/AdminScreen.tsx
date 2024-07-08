@@ -4,16 +4,11 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
-  Alert,
-  Dimensions,
+  TouchableOpacity
 } from "react-native";
-import { collection, query, getDocs, deleteDoc, doc, updateDoc, where } from 'firebase/firestore';
+import { collection, query, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Toast from "react-native-toast-message";
-import Role from "../Enums/user_role";
-
-const { width } = Dimensions.get("window");
 
 interface Reservation {
   id: string;
@@ -173,5 +168,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-
-export default AdminScreen;

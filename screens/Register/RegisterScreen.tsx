@@ -10,12 +10,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  ScrollView,
 } from "react-native";
 import { auth, db, provider } from "../../firebase";
 import Toast from "react-native-toast-message";
 import Role from "../Enums/user_role";
 import { TextInputMask } from "react-native-masked-text";
 import { Picker } from "@react-native-picker/picker";
+import { Pressable } from 'react-native';
 
 export const RegisterScreen: React.FC = () => {
   const [Ime, setFirstName] = useState("");
@@ -123,76 +125,82 @@ export const RegisterScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
-      <TextInput
-        style={styles.input}
-        value={Ime}
-        onChangeText={setFirstName}
-        placeholder="First Name"
-        placeholderTextColor="#999"
-      />
-      <TextInput
-        style={styles.input}
-        value={Prezime}
-        onChangeText={setLastName}
-        placeholder="Last Name"
-        placeholderTextColor="#999"
-      />
-      <TextInput
-        style={styles.input}
-        value={Email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        placeholderTextColor="#999"
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={styles.input}
-        value={Lozinka}
-        onChangeText={setPassword}
-        placeholder="Password"
-        placeholderTextColor="#999"
-        secureTextEntry={true}
-      />
-      <TextInputMask
-        type={"datetime"}
-        options={{
-          format: "DD.MM.YYYY",
-        }}
-        value={Datum_rodjenja}
-        onChangeText={setBirthDate}
-        style={styles.input}
-        placeholder="Birth Date (DD.MM.YYYY)"
-        placeholderTextColor="#999"
-        keyboardType="numeric"
-      />
-      <Picker
-        selectedValue={Spol}
-        style={styles.input}
-        onValueChange={(itemValue: string) => setGender(itemValue)}
-      >
-        <Picker.Item label="Select Gender" value="" />
-        <Picker.Item label="Male" value="male" />
-        <Picker.Item label="Female" value="female" />
-      </Picker>
-      <TextInput
-        style={styles.input}
-        value={Telefon}
-        onChangeText={setPhoneNumber}
-        placeholder="Phone Number"
-        placeholderTextColor="#999"
-        keyboardType="phone-pad"
-      />
-      <TouchableOpacity style={styles.button} onPress={registerAndGoToMainFlow}>
-        <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.googleButton} onPress={signInWithGoogle}>
-        <Image source={require("../../assets/google.png")} style={styles.googleIcon} />
-        <Text style={styles.googleButtonText}>Register with Google</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={goToLogin}>
-        <Text style={styles.loginText}>Already have an account? Login</Text>
-      </TouchableOpacity>
+      <View style={styles.headerContainer}>
+        <Pressable onPress={goToLogin}>
+          <Text style={styles.headerText}>Login</Text>
+        </Pressable>
+        <Text style={[styles.headerText, styles.activeTab]}>Register</Text>
+      </View>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            value={Ime}
+            onChangeText={setFirstName}
+            placeholder="First Name"
+            placeholderTextColor="#999"
+          />
+          <TextInput
+            style={styles.input}
+            value={Prezime}
+            onChangeText={setLastName}
+            placeholder="Last Name"
+            placeholderTextColor="#999"
+          />
+          <TextInput
+            style={styles.input}
+            value={Email}
+            onChangeText={setEmail}
+            placeholder="Email"
+            placeholderTextColor="#999"
+            keyboardType="email-address"
+          />
+          <TextInput
+            style={styles.input}
+            value={Lozinka}
+            onChangeText={setPassword}
+            placeholder="Password"
+            placeholderTextColor="#999"
+            secureTextEntry={true}
+          />
+          <TextInputMask
+            type={"datetime"}
+            options={{
+              format: "DD.MM.YYYY",
+            }}
+            value={Datum_rodjenja}
+            onChangeText={setBirthDate}
+            style={styles.input}
+            placeholder="Birth Date (DD.MM.YYYY)"
+            placeholderTextColor="#999"
+            keyboardType="numeric"
+          />
+          <Picker
+            selectedValue={Spol}
+            style={styles.input}
+            onValueChange={(itemValue: string) => setGender(itemValue)}
+          >
+            <Picker.Item label="Select Gender" value="" />
+            <Picker.Item label="Male" value="male" />
+            <Picker.Item label="Female" value="female" />
+          </Picker>
+          <TextInput
+            style={styles.input}
+            value={Telefon}
+            onChangeText={setPhoneNumber}
+            placeholder="Phone Number"
+            placeholderTextColor="#999"
+            keyboardType="phone-pad"
+          />
+        </View>
+        <TouchableOpacity style={styles.button} onPress={registerAndGoToMainFlow}>
+          <Text style={styles.buttonText}>Register</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.googleButton} onPress={signInWithGoogle}>
+          <Image source={require("../../assets/google.png")} style={styles.googleIcon} />
+          <Text style={styles.googleButtonText}>Register with Google</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 };
@@ -200,16 +208,40 @@ export const RegisterScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f2f2f0",
+    padding: 20,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 30,
+  },
+  headerText: {
+    fontSize: 20,
+    color: "#2c365d",
+    marginHorizontal: 15,
+  },
+  activeTab: {
+    fontWeight: "bold",
+    borderBottomWidth: 2,
+    borderBottomColor: "#ff5e3a",
+  },
+  scrollViewContent: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f2f2f0",
   },
-  title: {
-    fontSize: 36,
-    fontWeight: "bold",
-    color: "#2c365d",
+  inputContainer: {
+    width: "100%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
     marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
   },
   input: {
     width: "100%",
@@ -256,10 +288,4 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  loginText: {
-    color: "#2c365d",
-    textAlign: "center",
-  },
 });
-
-export default RegisterScreen;
