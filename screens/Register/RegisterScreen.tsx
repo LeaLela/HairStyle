@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { collection, doc, setDoc, getDocs, query, limit } from "firebase/firestore";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -8,9 +8,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet
+  StyleSheet,
+  Image,
 } from "react-native";
-import { auth, db } from "../../firebase";
+import { auth, db, provider } from "../../firebase";
 import Toast from "react-native-toast-message";
 import Role from "../Enums/user_role";
 import { TextInputMask } from "react-native-masked-text";
@@ -26,19 +27,19 @@ export const RegisterScreen: React.FC = () => {
   const [Spol, setGender] = useState("");
 
   const nav = useNavigation<NativeStackNavigationProp<any>>();
-  
+
   const goToLogin = async () => {
     nav.navigate("Login");
   };
 
-  const createProfile = async (response: any, role: Role) => {
+  const createProfile = async (user: any, role: Role) => {
     const usersCollection = collection(db, "users");
-    const userDoc = doc(usersCollection, response.user.uid);
+    const userDoc = doc(usersCollection, user.uid);
 
     await setDoc(userDoc, {
       Ime,
       Prezime,
-      Email,
+      Email: user.email,
       Telefon,
       Spol,
       Datum_rodjenja,
@@ -74,7 +75,7 @@ export const RegisterScreen: React.FC = () => {
 
       const isFirstUser = (await getDocs(query(collection(db, "users"), limit(1)))).empty;
 
-      createProfile(response, isFirstUser ? Role.Admin : Role.User);
+      await createProfile(response.user, isFirstUser ? Role.Admin : Role.User);
       setFirstName("");
       setLastName("");
       setPhoneNumber("");
@@ -90,6 +91,28 @@ export const RegisterScreen: React.FC = () => {
       goToLogin();
     } catch (error: any) {
       console.log(error);
+      Toast.show({
+        type: "error",
+        text1: "Registration Failed",
+        text2: error.message || "Something went wrong",
+      });
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const isFirstUser = (await getDocs(query(collection(db, "users"), limit(1)))).empty;
+      await createProfile(user, isFirstUser ? Role.Admin : Role.User);
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "You have successfully registered with Google",
+      });
+      goToLogin();
+    } catch (error: any) {
+      console.error("Error during Google sign-in", error);
       Toast.show({
         type: "error",
         text1: "Registration Failed",
@@ -163,6 +186,10 @@ export const RegisterScreen: React.FC = () => {
       <TouchableOpacity style={styles.button} onPress={registerAndGoToMainFlow}>
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.googleButton} onPress={signInWithGoogle}>
+        <Image source={require("../../assets/google.png")} style={styles.googleIcon} />
+        <Text style={styles.googleButtonText}>Register with Google</Text>
+      </TouchableOpacity>
       <TouchableOpacity onPress={goToLogin}>
         <Text style={styles.loginText}>Already have an account? Login</Text>
       </TouchableOpacity>
@@ -204,6 +231,28 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#f2f2f0",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  googleButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: 50,
+    backgroundColor: "#fff",
+    borderRadius: 25,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  googleIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+  },
+  googleButtonText: {
+    color: "#2c365d",
     fontSize: 18,
     fontWeight: "bold",
   },
