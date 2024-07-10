@@ -1,7 +1,7 @@
 export enum ServiceTypesMen {
-    hair_color = "Shave",
+    shave = "Shave",
     hair_cut = "Hair Cut",
-    hair_cut_color = "Hair Cut & Shave",
+    hair_cut_shave = "Hair Cut & Shave",
   }
   export const getServiceOptions = () => {
     return Object.keys(ServiceTypesMen).map((key) => {
