@@ -57,6 +57,13 @@ export const MenScreen: React.FC = () => {
 
     fetchDisabledSlots();
   }, [daysOfMonth, times]);
+  
+  const today = new Date();
+  const filteredDaysOfMonth = daysOfMonth.filter(day => {
+    const [dayName, dayNumber] = day.split(" ");
+    const dayDate = new Date(today.getFullYear(), today.getMonth(), parseInt(dayNumber));
+    return dayDate >= today;
+  });
 
   return (
     <View style={styles.container}>
