@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -12,9 +13,10 @@ import { db } from "../../firebase";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import { useHandleConfirm } from "../../utils/useHandleConfirm";
-import { ServiceTypesMen, getServiceOptions } from "../../utils/serviceTypesMen";
+import { getServiceOptions } from "../../utils/serviceTypesMen";
 import { useDateAndTime, useUserData } from "../../hooks/hooks";
 import { getDisabledSlots } from "../../utils/getDisableSlots";
+import { isToday, parse, getHours } from "date-fns";
 
 const { width } = Dimensions.get("window");
 
@@ -28,9 +30,7 @@ export const MenScreen: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [disabledSlots, setDisabledSlots] = useState<
-    { day: string; time: string }[]
-  >([]);
+  const [disabledSlots, setDisabledSlots] = useState<{ day: string; time: string }[]>([]);
 
   const handleDaySelection = (day: string) => {
     setSelectedDay(day);
@@ -57,13 +57,17 @@ export const MenScreen: React.FC = () => {
 
     fetchDisabledSlots();
   }, [daysOfMonth, times]);
-  
-  const today = new Date();
-  const filteredDaysOfMonth = daysOfMonth.filter(day => {
-    const [dayName, dayNumber] = day.split(" ");
-    const dayDate = new Date(today.getFullYear(), today.getMonth(), parseInt(dayNumber));
-    return dayDate >= today;
-  });
+
+  const filterTimes = (times: string[], selectedDay: string | null) => {
+    if (selectedDay && isToday(parse(selectedDay, "EEE dd", new Date()))) {
+      const currentHour = getHours(new Date());
+      return times.filter(time => {
+        const [hour] = time.split(":");
+        return parseInt(hour) > currentHour;
+      });
+    }
+    return times;
+  };
 
   return (
     <View style={styles.container}>
@@ -88,14 +92,13 @@ export const MenScreen: React.FC = () => {
             >
               {day}
             </Text>
-           
           </TouchableOpacity>
         ))}
       </ScrollView>
 
       <Text style={styles.subtitle}>Available Slots</Text>
       <ScrollView horizontal contentContainerStyle={styles.timeContainer}>
-        {times.map((time) => {
+        {filterTimes(times, selectedDay).map((time) => {
           const isDisabled = disabledSlots.some(
             (slot) => slot.day === selectedDay && slot.time === time
           );

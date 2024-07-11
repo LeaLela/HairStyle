@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isBefore } from "date-fns";
 import { auth } from "../firebase";
 
-
 export const useUserData = () => {
   const [userId, setUserId] = useState<string | null>(null);
 

@@ -12,15 +12,16 @@ import { db } from "../../firebase";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import { useHandleConfirm } from "../../utils/useHandleConfirm";
+import { getServiceOptions } from "../../utils/serviceTypes";
 import { useDateAndTime, useUserData } from "../../hooks/hooks";
 import { getDisabledSlots } from "../../utils/getDisableSlots";
-import { getServiceOptions } from '../../utils/serviceTypes';
+import { isToday, parse, getHours } from "date-fns";
 
 const { width } = Dimensions.get("window");
 
 type WomenScreenRouteProp = RouteProp<RootStackParamList, "WomenScreen">;
 
-export const WomenScreenCopy: React.FC = () => {
+export const WomenScreen: React.FC = () => {
   const route = useRoute<WomenScreenRouteProp>();
   const userId = useUserData();
   const { daysOfMonth, times } = useDateAndTime();
@@ -55,6 +56,17 @@ export const WomenScreenCopy: React.FC = () => {
     fetchDisabledSlots();
   }, [daysOfMonth, times]);
 
+  const filterTimes = (times: string[], selectedDay: string | null) => {
+    if (selectedDay && isToday(parse(selectedDay, "EEE dd", new Date()))) {
+      const currentHour = getHours(new Date());
+      return times.filter(time => {
+        const [hour] = time.split(":");
+        return parseInt(hour) > currentHour;
+      });
+    }
+    return times;
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Appointment</Text>
@@ -84,7 +96,7 @@ export const WomenScreenCopy: React.FC = () => {
 
       <Text style={styles.subtitle}>Available Slots</Text>
       <ScrollView horizontal contentContainerStyle={styles.timeContainer}>
-        {times.map((time) => {
+        {filterTimes(times, selectedDay).map((time) => {
           const isDisabled = disabledSlots.some(
             (slot) => slot.day === selectedDay && slot.time === time
           );
