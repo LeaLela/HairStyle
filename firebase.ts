@@ -1,15 +1,16 @@
+import { API_KEY, APP_ID, AUTH_DOMAIN, DATABASE_URL, MESSAGING_SENDER_ID, PROJECT_ID, STORAGE_BUCKET } from "@env";
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBf8pstYeFpic8SeIwR0sWnK4WxK9uAaMc",
-  authDomain: "hairstylecalendar.firebaseapp.com",
-  databaseURL: "https://hairstylecalendar-default-rtdb.firebaseio.com",
-  projectId: "hairstylecalendar",
-  storageBucket: "hairstylecalendar.appspot.com",
-  messagingSenderId: "648004642153",
-  appId: "1:648004642153:web:38d64f94526db0201cc9f8"
+  apiKey: API_KEY,
+  authDomain: AUTH_DOMAIN,
+  databaseURL: DATABASE_URL,
+  projectId: PROJECT_ID,
+  storageBucket: STORAGE_BUCKET,
+  messagingSenderId: MESSAGING_SENDER_ID,
+  appId: APP_ID
 };
 
 

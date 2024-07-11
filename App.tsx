@@ -19,6 +19,7 @@ import Role from './screens/Enums/user_role';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { TouchableOpacity, Image } from 'react-native';
+import { API_KEY} from "@env";
 
 export type RootStackParamList = {
   WomenScreen: { hairStyle: "Women" };
@@ -31,6 +32,7 @@ const App = () => {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  console.log(API_KEY);
 
   useEffect(() => {
     const checkUser = async () => {
